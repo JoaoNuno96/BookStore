@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using BookStore.Data;
+using BookStore.Models.Services;
 
 namespace BookStore
 {
@@ -24,13 +27,21 @@ namespace BookStore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddDbContext<BookStoreContext>(options =>
+                    options.UseMySql(Configuration.GetConnectionString("conn"), builder =>
+                    builder.MigrationsAssembly("BookStore")));
+
+            services.AddScoped<SeedingService>();
+            services.AddScoped<BookService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SeedingService ss)
         {
             if (env.IsDevelopment())
             {
+                ss.Seeding();
                 app.UseDeveloperExceptionPage();
             }
             else

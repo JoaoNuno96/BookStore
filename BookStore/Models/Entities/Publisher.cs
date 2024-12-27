@@ -6,7 +6,6 @@ namespace BookStore.Models.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<Book> ListBooks { get; set; } = new List<Book>();
         public Publisher() { }
         public Publisher(int id, string name)
         {
