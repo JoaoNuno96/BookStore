@@ -12,6 +12,9 @@ namespace BookStore.Models.Entities
         public Category Category { get; set; }
         public Publisher Publisher { get; set; }
         public Author Author { get; set; }
+        public int CategoryId { get; set; }
+        public int PublisherId { get; set; }
+        public int AuthorId { get; set; }
         public Book() { }
         public Book(int id, string name, int p, string siz, string img, Category cat, Publisher pub, Author auth)
         {

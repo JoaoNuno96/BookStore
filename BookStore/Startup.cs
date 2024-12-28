@@ -34,6 +34,9 @@ namespace BookStore
 
             services.AddScoped<SeedingService>();
             services.AddScoped<BookService>();
+            services.AddScoped<AuthorService>();
+            services.AddScoped<CategoryService>();
+            services.AddScoped<PublisherService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

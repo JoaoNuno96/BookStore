@@ -41,7 +41,7 @@ namespace BookStore.Data
             Book hp4 = new Book(4, "Harry Potter and the Goblet of Fire", 636, "50x50", @"https://cdn.europosters.eu/image/1300/art-photo/harry-potter-goblet-of-fire-book-cover-i214929.jpg", c1, p1, a1);
             Book hp5 = new Book(5, "Harry Potter and the Order of the Phoenix", 766, "50x50", @"https://m.media-amazon.com/images/I/71pgI2ou5oL._AC_UF894,1000_QL80_.jpg", c1, p1, a1);
             Book hp6 = new Book(6, "Harry Potter and the Half-Blood Prince", 607, "50x50", @"https://m.media-amazon.com/images/I/81VsN7EOBfL._AC_UF894,1000_QL80_.jpg", c1, p1, a1);
-            Book hp7 = new Book(7, "Harry Potter and the Deathly Hallows", 607, "50x50", @"https://m.media-amazon.com/images/I/81VsN7EOBfL._AC_UF894,1000_QL80_.jpg", c1, p1, a1);
+            Book hp7 = new Book(7, "Harry Potter and the Deathly Hallows", 607, "50x50", @"https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1627042661i/58613224.jpg", c1, p1, a1);
 
             //THE INHERITANCE CYCLE
             Book ic1 = new Book(8, "Eragon", 544, "50x50", @"https://upload.wikimedia.org/wikipedia/en/c/ce/Eragon_book_cover.png", c1, p2, a2);
