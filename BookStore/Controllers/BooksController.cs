@@ -1,4 +1,5 @@
 ﻿using BookStore.Models.Services;
+using BookStore.Models.Services.Exceptions;
 using BookStore.Models.Entities;
 using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,7 @@ namespace BookStore.Controllers
             this._publisherservice = ps;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             List<Book> listbooks = this._bookservice.FindAllBooks();
@@ -28,6 +30,7 @@ namespace BookStore.Controllers
             return View(listbooks);
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             List<Category> listCategories = this._categoryservice.GetCategories();
@@ -51,6 +54,7 @@ namespace BookStore.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
         public IActionResult Delete(int? id)
         {
             if(id == null)
@@ -68,12 +72,70 @@ namespace BookStore.Controllers
             return View(book);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
             this._bookservice.RemoveBook(id);
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int? id)
+        {
+            //Verificar se o id recebido é nulo
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            //Verificar se esse id existe na base de dados
+            Book obj = this._bookservice.FindBookById((int)id.Value);
+
+            if(obj == null)
+            {
+                return NotFound();
+            }
+
+            List<Category> listCategories = this._categoryservice.GetCategories();
+            List<Author> listAuthors = this._authorservice.GetAuthors();
+            List<Publisher> listPublishers = this._publisherservice.GetPublishers();
+            Book book = this._bookservice.FindBookById(id.Value);
+
+            BookFormViewModel model = new BookFormViewModel
+            {
+                Book = book,
+                Authors = listAuthors,
+                Categories = listCategories,
+                Publishers = listPublishers
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Book book)
+        {
+            if(id != book.Id)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                this._bookservice.Update(book);
+                return RedirectToAction(nameof(Index));
+            }
+            catch(NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            catch(DbConcurrencyException)
+            {
+                return BadRequest();
+            }
+            
         }
     }
 }

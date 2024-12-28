@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using BookStore.Models.Entities;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Models.Services
 {
@@ -12,6 +13,7 @@ namespace BookStore.Models.Services
         {
             this._context = context;
         }
+        [HttpGet]
         public List<Author> GetAuthors()
         {
             return this._context.Author.ToList();
