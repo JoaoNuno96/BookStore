@@ -51,16 +51,28 @@ namespace BookStore.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete()
+        public IActionResult Delete(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            Book book = this._bookservice.FindBookById(id.Value);
+
+            if(book == null)
+            {
+                return NotFound();
+            }
+
+            return View(book);
         }
 
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int bookId)
+        public IActionResult DeleteConfirmed(int id)
         {
-            this._bookservice.RemoveBook(bookId);
+            this._bookservice.RemoveBook(id);
             return RedirectToAction(nameof(Index));
         }
     }

@@ -1,0 +1,58 @@
+﻿@model BookStore.Models.Entities.Book;
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h3>Are you sure you want to delete it?</h3>
+
+<div>
+    <h4>Book</h4>
+    <hr />
+
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(x => x.Id)
+        </dt>
+        <dd>
+            @Html.DisplayFor(x => x.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(x => x.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(x => x.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(x => x.Pages)
+        </dt>
+        <dd>
+            @Html.DisplayFor(x => x.Pages)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(x => x.Sizes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(x => x.Sizes)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(x => x.ImageUrl)
+        </dt>
+        <dd>
+            @Html.DisplayFor(x => x.ImageUrl)
+        </dd>
+
+    </dl>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id" /> 
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index">Back To List</a>
+    </form>
+
+</div>
