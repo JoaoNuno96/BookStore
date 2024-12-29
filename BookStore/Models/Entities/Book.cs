@@ -1,4 +1,5 @@
 ﻿using BookStore.Models.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace BookStore.Models.Entities
 {
@@ -7,6 +8,8 @@ namespace BookStore.Models.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public int Pages { get; set; }
+
+        [Display(Name = "Book Measures")]
         public string Sizes { get; set; }
         public string ImageUrl { get; set; }
         public Category Category { get; set; }
