@@ -4,6 +4,7 @@ using BookStore.Models.Entities;
 using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System;
 
 namespace BookStore.Controllers
@@ -59,14 +60,14 @@ namespace BookStore.Controllers
         {
             if(id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new {message = "Id not provided!"});
             }
 
             Book book = this._bookservice.FindBookById(id.Value);
 
             if(book == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Book not found!" });
             }
 
             return View(book);
@@ -86,7 +87,7 @@ namespace BookStore.Controllers
             //Verificar se o id recebido é nulo
             if(id == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Id not provided!" });
             }
 
             //Verificar se esse id existe na base de dados
@@ -94,7 +95,7 @@ namespace BookStore.Controllers
 
             if(obj == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Error), new { message = "Book not found!" });
             }
 
             List<Category> listCategories = this._categoryservice.GetCategories();
@@ -119,7 +120,7 @@ namespace BookStore.Controllers
         {
             if(id != book.Id)
             {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = "Id not the same as Object passed!" });
             }
 
             try
@@ -127,15 +128,23 @@ namespace BookStore.Controllers
                 this._bookservice.Update(book);
                 return RedirectToAction(nameof(Index));
             }
-            catch(NotFoundException e)
+            catch(ApplicationException e)
             {
-                return NotFound(e.Message);
-            }
-            catch(DbConcurrencyException)
-            {
-                return BadRequest();
+                return RedirectToAction(nameof(Error), new { message = e.Message });
             }
             
+        }
+
+        public IActionResult Error(string message)
+        {
+            //Apanhar Id interno da requisição
+            ErrorViewModel model = new ErrorViewModel
+            {
+                Message = message,
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+
+            return View(model);
         }
     }
 }
