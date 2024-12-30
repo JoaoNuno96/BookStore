@@ -51,6 +51,22 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Book book)
         {
+            //Caso os dados estejam bem (validação backend)
+            if(!ModelState.IsValid)
+            {
+                List<Category> listCategories = this._categoryservice.GetCategories();
+                List<Author> listAuthors = this._authorservice.GetAuthors();
+                List<Publisher> listPublishers = this._publisherservice.GetPublishers();
+
+                BookFormViewModel model = new BookFormViewModel
+                {
+                    Authors = listAuthors,
+                    Categories = listCategories,
+                    Publishers = listPublishers
+                };
+
+                return View(model);
+            }
             this._bookservice.AddBook(book);
             return RedirectToAction(nameof(Index));
         }
@@ -118,7 +134,24 @@ namespace BookStore.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Book book)
         {
-            if(id != book.Id)
+            if (!ModelState.IsValid)
+            {
+                List<Category> listCategories = this._categoryservice.GetCategories();
+                List<Author> listAuthors = this._authorservice.GetAuthors();
+                List<Publisher> listPublishers = this._publisherservice.GetPublishers();
+
+                BookFormViewModel model = new BookFormViewModel
+                {
+                    Book = book,
+                    Authors = listAuthors,
+                    Categories = listCategories,
+                    Publishers = listPublishers
+                };
+
+                return View(model);
+            }
+
+            if (id != book.Id)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not the same as Object passed!" });
             }

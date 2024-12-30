@@ -4,8 +4,9 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1 class=@ViewData["Title"]</h1>
+<h1>@ViewData["Title"]</h1>
 
+<div asp-validation-summary="All" class="text-danger"></div>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
@@ -13,34 +14,38 @@
             <input hidden="" asp-for="Book.Id" />
 
             <div class="form-group">
-                <label asp-for="Book.Name" class="control-label h4"></label>
-                <input asp-for="Book.Name" class="form-control input-sm" />
+                <label asp-for="Book.Name" class="control-label"></label>
+                <input asp-for="Book.Name" class="form-control" />
+                <span asp-validation-for="Book.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Book.Pages" class="control-label h4"></label>
+                <label asp-for="Book.Pages" class="control-label"></label>
                 <input asp-for="Book.Pages" class="form-control" />
+                <span asp-validation-for="Book.Pages" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Book.Sizes" class="control-label h4"></label>
+                <label asp-for="Book.Sizes" class="control-label"></label>
                 <input asp-for="Book.Sizes" class="form-control" />
+                <span asp-validation-for="Book.Sizes" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Book.ImageUrl" class="control-label h4"></label>
+                <label asp-for="Book.ImageUrl" class="control-label"></label>
                 <input asp-for="Book.ImageUrl" class="form-control" />
+                <span asp-validation-for="Book.ImageUrl" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label class="control-label h4">Categoria</label>
+                <label class="control-label">Categoria</label>
                 <select asp-for="Book.CategoryId" asp-items="@(new SelectList(Model.Categories, "Id", "Nome"))" class="form-control"></select>
             </div>
 
             <div class="form-group">
-                <label class="control-label h4">Authors</label>
+                <label class="control-label">Authors</label>
                 <select asp-for="Book.AuthorId" asp-items="@(new SelectList(Model.Authors, "Id", "Name"))" class="form-control"></select>
             </div>
 
             <div class="form-group">
-                <label class="control-label h4">Publisher</label>
+                <label class="control-label">Publisher</label>
                 <select asp-for="Book.PublisherId" asp-items="@(new SelectList(Model.Publishers, "Id", "Name"))" class="form-control"></select>
             </div>
 
@@ -49,10 +54,12 @@
             </div>
 
         </form>
-    </div class="col-md-8">
-
-    <div>
-
     </div>
 
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
