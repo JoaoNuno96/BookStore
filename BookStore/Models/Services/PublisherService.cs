@@ -20,5 +20,29 @@ namespace BookStore.Models.Services
         {
             return await this._context.Publisher.ToListAsync();
         }
+
+        public async Task CreatePublisherAsync(Publisher pub)
+        {
+            await this._context.Publisher.AddAsync(pub);
+            await this._context.SaveChangesAsync();
+        }
+
+        public async Task<Publisher> GetPublisherFromIdAsync(int id)
+        {
+            return await this._context.Publisher.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task UpdatePublisherAsync(Publisher pub)
+        {
+            this._context.Publisher.Update(pub);
+            await this._context.SaveChangesAsync();
+        }
+
+        public async Task RemovePublisher(int id)
+        {
+            Publisher pub = await this.GetPublisherFromIdAsync(id);
+            this._context.Publisher.Remove(pub);
+            await this._context.SaveChangesAsync();
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace BookStore.Models.Services
         public async Task RemoveBookAsync(int id)
         {
             Book book = await this.FindBookByIdAsync(id);
-            this._context.Remove(book);
+            this._context.Book.Remove(book);
             await this._context.SaveChangesAsync();
         }
 

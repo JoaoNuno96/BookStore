@@ -20,5 +20,28 @@ namespace BookStore.Models.Services
         {
             return await this._context.Category.ToListAsync();
         }
+
+        public async Task CreateCategoryAsync(Category ca)
+        {
+            await this._context.Category.AddAsync(ca);
+            await this._context.SaveChangesAsync();
+        }
+        public async Task<Category> GetCategoryById(int id)
+        {
+            return await this._context.Category.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task EditCategoryAsync(Category ca)
+        {
+            this._context.Category.Update(ca);
+            await this._context.SaveChangesAsync();
+        }
+
+        public async Task RemoveCategoryAsync(int id)
+        {
+            Category ca = await this.GetCategoryById(id);
+            this._context.Category.Remove(ca);
+            await this._context.SaveChangesAsync();
+        }
     }
 }

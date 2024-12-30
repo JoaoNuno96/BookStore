@@ -20,5 +20,29 @@ namespace BookStore.Models.Services
         {
             return await this._context.Author.ToListAsync();
         }
+
+        public async Task AddAuthorAsync(Author au)
+        {
+            await this._context.Author.AddAsync(au);
+            await this._context.SaveChangesAsync();
+        }
+
+        public async Task<Author> FindAuthorByIdAsync(int id)
+        {
+            return await this._context.Author.FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        public async Task EditAuthorAsync(Author au)
+        {
+            this._context.Author.Update(au);
+            await this._context.SaveChangesAsync();
+        }
+
+        public async Task RemoveAuthorAsync(int id)
+        {
+            Author au = await this.FindAuthorByIdAsync(id);
+            this._context.Author.Remove(au);
+            await this._context.SaveChangesAsync();
+        }
     }
 }
