@@ -3,10 +3,12 @@ using BookStore.Models.Entities;
 using BookStore.Models.Services.Exceptions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using Microsoft.EntityFrameworkCore.Internal;
-using System;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Models.Services
@@ -18,30 +20,30 @@ namespace BookStore.Models.Services
         {
             this._context = context;
         }
-        [HttpGet]
-        public List<Book> FindAllBooks()
+
+        public async Task<List<Book>> FindAllBooksAsync()
         {
-            return this._context.Book.Include(x => x.Category)
+            return await this._context.Book.Include(x => x.Category)
                                      .Include(x => x.Publisher)
                                      .Include(x => x.Author)
                                      .OrderBy(x => x.Id)
-                                     .ToList();
-        }
-        [HttpGet("{id}")]
-        public Book FindBookById(int id)
-        {
-            return this._context.Book.FirstOrDefault(x => x.Id == id);
+                                     .ToListAsync();
         }
 
-        public void AddBook(Book book)
+        public async Task<Book> FindBookByIdAsync(int id)
+        {
+            return await this._context.Book.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task AddBookAsync(Book book)
         {
             this._context.Add(book);
-            this._context.SaveChanges();
+            await this._context.SaveChangesAsync();
         }
 
-        public void Update(Book book)
+        public async Task UpdateAsync(Book book)
         {
-            if(!this._context.Book.Any(x => x.Id == book.Id))
+            if(!await this._context.Book.AnyAsync(x => x.Id == book.Id))
             {
                 throw new NotFoundException("Id not Found");
             }
@@ -49,7 +51,7 @@ namespace BookStore.Models.Services
             try
             {
                 this._context.Update(book);
-                this._context.SaveChanges();
+                await this._context.SaveChangesAsync();
             }
             catch(DbUpdateConcurrencyException e)
             {
@@ -58,11 +60,11 @@ namespace BookStore.Models.Services
             
         }
 
-        public void RemoveBook(int id)
+        public async Task RemoveBookAsync(int id)
         {
-            Book book = this.FindBookById(id);
+            Book book = await this.FindBookByIdAsync(id);
             this._context.Remove(book);
-            this._context.SaveChanges();
+            await this._context.SaveChangesAsync();
         }
 
     }

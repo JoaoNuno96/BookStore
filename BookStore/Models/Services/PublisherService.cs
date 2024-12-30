@@ -1,8 +1,10 @@
 ﻿using BookStore.Data;
 using BookStore.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BookStore.Models.Services
 {
@@ -13,10 +15,10 @@ namespace BookStore.Models.Services
         {
             this._context = contx;
         }
-        [HttpGet]
-        public List<Publisher> GetPublishers()
+ 
+        public async Task<List<Publisher>> GetPublishersAsync()
         {
-            return this._context.Publisher.ToList();
+            return await this._context.Publisher.ToListAsync();
         }
     }
 }

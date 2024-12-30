@@ -3,7 +3,9 @@ using BookStore.Models.Services.Exceptions;
 using BookStore.Models.Entities;
 using BookStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Diagnostics;
 using System;
 
@@ -24,19 +26,19 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            List<Book> listbooks = this._bookservice.FindAllBooks();
+            List<Book> listbooks = await this._bookservice.FindAllBooksAsync();
 
             return View(listbooks);
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            List<Category> listCategories = this._categoryservice.GetCategories();
-            List<Author> listAuthors = this._authorservice.GetAuthors();
-            List<Publisher> listPublishers = this._publisherservice.GetPublishers();
+            List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
+            List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
+            List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
 
             BookFormViewModel model = new BookFormViewModel
             {
@@ -49,14 +51,14 @@ namespace BookStore.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Book book)
+        public async Task<IActionResult> Create(Book book)
         {
             //Caso os dados estejam bem (validação backend)
             if(!ModelState.IsValid)
             {
-                List<Category> listCategories = this._categoryservice.GetCategories();
-                List<Author> listAuthors = this._authorservice.GetAuthors();
-                List<Publisher> listPublishers = this._publisherservice.GetPublishers();
+                List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
+                List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
+                List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
 
                 BookFormViewModel model = new BookFormViewModel
                 {
@@ -67,19 +69,19 @@ namespace BookStore.Controllers
 
                 return View(model);
             }
-            this._bookservice.AddBook(book);
+            await this._bookservice.AddBookAsync(book);
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if(id == null)
             {
                 return RedirectToAction(nameof(Error), new {message = "Id not provided!"});
             }
 
-            Book book = this._bookservice.FindBookById(id.Value);
+            Book book = await this._bookservice.FindBookByIdAsync(id.Value);
 
             if(book == null)
             {
@@ -91,14 +93,14 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            this._bookservice.RemoveBook(id);
+            await this._bookservice.RemoveBookAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             //Verificar se o id recebido é nulo
             if(id == null)
@@ -107,17 +109,17 @@ namespace BookStore.Controllers
             }
 
             //Verificar se esse id existe na base de dados
-            Book obj = this._bookservice.FindBookById((int)id.Value);
+            Book obj = await this._bookservice.FindBookByIdAsync((int)id.Value);
 
             if(obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Book not found!" });
             }
 
-            List<Category> listCategories = this._categoryservice.GetCategories();
-            List<Author> listAuthors = this._authorservice.GetAuthors();
-            List<Publisher> listPublishers = this._publisherservice.GetPublishers();
-            Book book = this._bookservice.FindBookById(id.Value);
+            List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
+            List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
+            List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
+            Book book = await this._bookservice.FindBookByIdAsync(id.Value);
 
             BookFormViewModel model = new BookFormViewModel
             {
@@ -132,13 +134,14 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Book book)
+        public async Task<IActionResult> Edit(int id, Book book)
         {
             if (!ModelState.IsValid)
             {
-                List<Category> listCategories = this._categoryservice.GetCategories();
-                List<Author> listAuthors = this._authorservice.GetAuthors();
-                List<Publisher> listPublishers = this._publisherservice.GetPublishers();
+                List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
+                List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
+                List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
+
 
                 BookFormViewModel model = new BookFormViewModel
                 {
@@ -158,7 +161,7 @@ namespace BookStore.Controllers
 
             try
             {
-                this._bookservice.Update(book);
+                await this._bookservice.UpdateAsync(book);
                 return RedirectToAction(nameof(Index));
             }
             catch(ApplicationException e)

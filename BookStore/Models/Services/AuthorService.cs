@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using BookStore.Models.Entities;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Models.Services
 {
@@ -13,10 +15,10 @@ namespace BookStore.Models.Services
         {
             this._context = context;
         }
-        [HttpGet]
-        public List<Author> GetAuthors()
+
+        public async Task<List<Author>> GetAuthorsAsync()
         {
-            return this._context.Author.ToList();
+            return await this._context.Author.ToListAsync();
         }
     }
 }
