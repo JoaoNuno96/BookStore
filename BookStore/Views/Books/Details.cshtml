@@ -1,0 +1,52 @@
+﻿@model BookStore.Models.Entities.Book;
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-6">
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.Name):</h5>
+        <p>@Html.DisplayFor(x => x.Name)</p>
+
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.Pages):</h5>
+        <p>@Html.DisplayFor(x => x.Pages)</p>
+
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.Sizes):</h5>
+        <p>@Html.DisplayFor(x => x.Sizes)</p>
+
+        <hr />
+
+        <div class="row">
+
+            <div class="col-6">
+                <h5 class="font-weight-bold">Autor(a)</h5>
+                <p>@Html.DisplayFor(x => x.Author.Name)</p>
+            </div>
+
+            <div class="col-6 d-flex justify-content-center">
+                <img class="text-center" src="@Html.DisplayFor(x => x.Author.Image)" height="100px"/>
+            </div>
+
+        </div>
+        
+        <hr />
+
+        <h5 class="font-weight-bold">Categoria</h5>
+        <p>@Html.DisplayFor(x => x.Category.Nome)</p>
+
+        <hr />
+
+        <h5 class="font-weight-bold">Editora</h5>
+        <p>@Html.DisplayFor(x => x.Publisher.Name)</p>
+
+    </div>
+    <div class="col-6">
+        <img src="@Html.DisplayFor(x => x.ImageUrl)" width="90%" />
+    </div>
+
+</div>
+

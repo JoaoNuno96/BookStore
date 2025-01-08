@@ -49,6 +49,15 @@ namespace BookStore.Controllers
 
             return View(model);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            Book book = await this._bookservice.FindBookByIdAsync(id);
+            return View(book);
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Book book)

@@ -15,7 +15,6 @@ namespace BookStore.Models.Services
         {
             this._context = contx;
         }
- 
         public async Task<List<Publisher>> GetPublishersAsync()
         {
             return await this._context.Publisher.ToListAsync();

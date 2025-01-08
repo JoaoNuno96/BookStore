@@ -32,7 +32,10 @@ namespace BookStore.Models.Services
 
         public async Task<Book> FindBookByIdAsync(int id)
         {
-            return await this._context.Book.FirstOrDefaultAsync(x => x.Id == id);
+            return await this._context.Book.Include(x => x.Category)
+                                     .Include(x => x.Publisher)
+                                     .Include(x => x.Author)
+                                     .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task AddBookAsync(Book book)
