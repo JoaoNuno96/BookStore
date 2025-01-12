@@ -22,6 +22,32 @@ namespace BookStore.Controllers
             return View(listAuth);
         }
 
+        public async Task<IActionResult> Edit(int id)
+        {
+            Author auth = await this._authservice.FindAuthorByIdAsync(id);
+
+            return View(auth);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Author auth)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(await this._authservice.FindAuthorByIdAsync(id));
+            }
+
+            await this._authservice.EditAuthorAsync(auth);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            return View(await this._authservice.FindAuthorByIdAsync(id));
+        }
+
         
     }
 }

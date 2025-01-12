@@ -1,0 +1,27 @@
+﻿@model BookStore.Models.Entities.Author;
+@{
+    ViewData["title"] = $"Author - {Model.Name}";
+}
+
+<h1>@ViewData["title"]</h1>
+
+<div class="row">
+    <div class="col-6">
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.Name):</h5>
+        <p>@Html.DisplayFor(x => x.Name)</p>
+
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.BirthDay):</h5>
+        <p>@Html.DisplayFor(x => x.BirthDay)</p>
+
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.Nationality):</h5>
+        <p>@Html.DisplayFor(x => x.Nationality)</p>
+
+        <hr />
+
+    </div>
+    <div class="col-6">
+        <img src="@Html.DisplayFor(x => x.Image)" width="90%" />
+    </div>
+
+</div>
+
