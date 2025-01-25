@@ -13,6 +13,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using BookStore.Data;
 using BookStore.Models.Services;
+using BookStore.Models.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookStore
 {
@@ -39,6 +41,22 @@ namespace BookStore
             services.AddScoped<AuthorService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<PublisherService>();
+
+            // Add Identity services
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            // Add authentication and authorization services
+            services.AddAuthentication()
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";  // Path to login page
+                    options.LogoutPath = "/Account/Logout"; // Path to logout page
+                });
+
+            // Add MVC and Razor Pages
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,7 +89,10 @@ namespace BookStore
 
             app.UseRouting();
 
+            // Enable authentication and authorization
+            app.UseAuthentication();
             app.UseAuthorization();
+
 
             app.UseEndpoints(endpoints =>
             {
