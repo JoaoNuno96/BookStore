@@ -6,9 +6,6 @@ namespace BookStore.Models.Entities
     public class Book
     {
         public int Id { get; set; }
-
-        [Required(ErrorMessage = "Name Required")]
-        [StringLength(20, MinimumLength = 6, ErrorMessage = "{0} should be between {2} and {1}")]
         public string Name { get; set; }
         public int Pages { get; set; }
 

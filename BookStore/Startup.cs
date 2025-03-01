@@ -43,8 +43,8 @@ namespace BookStore
             services.AddScoped<PublisherService>();
 
             // Add Identity services
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+            services.AddIdentity<User, IdentityRole<int>>()
+                .AddEntityFrameworkStores<BookStoreContext>()
                 .AddDefaultTokenProviders();
 
             // Add authentication and authorization services

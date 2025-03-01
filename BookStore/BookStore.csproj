@@ -5,6 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20250301142923_AddIdentifyTables.cs" />
+    <Compile Remove="Migrations\20250301142923_AddIdentifyTables.Designer.cs" />
+    <Compile Remove="Migrations\20250301143417_AddIdentifyTables.cs" />
+    <Compile Remove="Migrations\20250301143417_AddIdentifyTables.Designer.cs" />
+    <Compile Remove="Migrations\20250301143614_AddIdentifyTables.cs" />
+    <Compile Remove="Migrations\20250301143614_AddIdentifyTables.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.32" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.32" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.32">
