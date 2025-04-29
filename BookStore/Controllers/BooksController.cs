@@ -8,58 +8,69 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System;
+using System.Net.Http;
+using Newtonsoft.Json;
 
 namespace BookStore.Controllers
 {
     public class BooksController : Controller
     {
+        private readonly HttpClient _httpClient;
+
         private readonly BookService _bookservice;
         private readonly AuthorService _authorservice;
         private readonly CategoryService _categoryservice;
         private readonly PublisherService _publisherservice;
-        public BooksController(BookService bookservice, AuthorService aus, CategoryService cs, PublisherService ps)
+        public BooksController(IHttpClientFactory httpclint,BookService bookservice, AuthorService aus, CategoryService cs, PublisherService ps)
         {
+            this._httpClient = httpclint.CreateClient("BookApi");
             this._bookservice = bookservice;
             this._authorservice = aus;
             this._categoryservice = cs;
             this._publisherservice = ps;
         }
 
-        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            List<Book> listbooks = await this._bookservice.FindAllBooksAsync();
+            HttpResponseMessage response = await _httpClient.GetAsync("getAll");
 
-            return View(listbooks);
+            if(response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                List<Book> listbooks = JsonConvert.DeserializeObject<List<Book>>(json);
+                return View(listbooks);
+            }
+
+            return View(new List<Book>());
         }
 
-        [HttpGet]
+
         public async Task<IActionResult> Create()
         {
-            List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
-            List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
-            List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
-
-            BookFormViewModel model = new BookFormViewModel
+            HttpResponseMessage response = await _httpClient.GetAsync("getViewModel");
+            if (response.IsSuccessStatusCode)
             {
-                Authors = listAuthors,
-                Categories = listCategories,
-                Publishers = listPublishers
-            };
-
-            return View(model);
+                var json = await response.Content.ReadAsStringAsync();
+                BookFormViewModel bookViewModel = JsonConvert.DeserializeObject<BookFormViewModel>(json);
+                return View(bookViewModel);
+            }
+            return View(new BookFormViewModel());
         }
 
-        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            Book book = await this._bookservice.FindBookByIdAsync(id);
-            return View(book);
+            HttpResponseMessage response = await _httpClient.GetAsync($"details/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                Book book = JsonConvert.DeserializeObject<Book>(json);
+                return View(book);
+            }
+
+            return View(new Book());
         }
 
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Book book)
         {
             //Caso os dados estejam bem (validação backend)
@@ -82,7 +93,7 @@ namespace BookStore.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
+  
         public async Task<IActionResult> Delete(int? id)
         {
             if(id == null)
@@ -100,15 +111,12 @@ namespace BookStore.Controllers
             return View(book);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await this._bookservice.RemoveBookAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             //Verificar se o id recebido é nulo
@@ -141,8 +149,6 @@ namespace BookStore.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Book book)
         {
             if (!ModelState.IsValid)

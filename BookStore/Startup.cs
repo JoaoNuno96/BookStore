@@ -42,6 +42,11 @@ namespace BookStore
             services.AddScoped<CategoryService>();
             services.AddScoped<PublisherService>();
 
+            services.AddHttpClient("BookApi", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:44334/api/APIBooks/");
+            });
+
             // Add Identity services
             services.AddIdentity<User, IdentityRole<int>>()
                 .AddEntityFrameworkStores<BookStoreContext>()
