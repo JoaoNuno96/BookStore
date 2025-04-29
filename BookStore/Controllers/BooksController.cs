@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System;
 using System.Net.Http;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace BookStore.Controllers
 {
@@ -76,20 +77,20 @@ namespace BookStore.Controllers
             //Caso os dados estejam bem (validação backend)
             if(!ModelState.IsValid)
             {
-                List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
-                List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
-                List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
-
-                BookFormViewModel model = new BookFormViewModel
+                HttpResponseMessage response = await _httpClient.GetAsync("getViewModel");
+                if (response.IsSuccessStatusCode)
                 {
-                    Authors = listAuthors,
-                    Categories = listCategories,
-                    Publishers = listPublishers
-                };
-
-                return View(model);
+                    var json = await response.Content.ReadAsStringAsync();
+                    BookFormViewModel bookViewModel = JsonConvert.DeserializeObject<BookFormViewModel>(json);
+                    return View(bookViewModel);
+                }
+                return View(new BookFormViewModel());
             }
-            await this._bookservice.AddBookAsync(book);
+            //JSONCONVERT -> ORGANIZE CONTENT WITH JSON -> HTTPRESPONSEMESSAGE
+            var jsonContent = JsonConvert.SerializeObject(book);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage responsePOST = await _httpClient.PostAsync("create/book", content);
+
             return RedirectToAction(nameof(Index));
         }
 
