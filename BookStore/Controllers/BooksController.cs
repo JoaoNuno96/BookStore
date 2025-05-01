@@ -131,7 +131,7 @@ namespace BookStore.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-  
+        [HttpGet]
         public async Task<IActionResult> Delete(int? id)
         {
             if(id == null)
@@ -155,8 +155,8 @@ namespace BookStore.Controllers
             }
 
         }
-
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
         {
 
             using (HttpResponseMessage response = await this._httpClientBook.GetAsync($"remove/{id}"))

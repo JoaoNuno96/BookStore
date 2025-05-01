@@ -84,7 +84,7 @@ namespace BookStore.Controllers.API
         }
 
         [HttpPost("create/book")]
-        public async Task<ActionResult<Book>> CreateBook(Book book)
+        public async Task<ActionResult<Book>> CreateBook([FromBody] Book book)
         {
             if (!ModelState.IsValid)
             {
@@ -107,7 +107,7 @@ namespace BookStore.Controllers.API
         }
 
         [HttpPatch("update/book")]
-        public async Task<ActionResult<bool>> UpdateBook(Book book)
+        public async Task<ActionResult<bool>> UpdateBook([FromBody] Book book)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace BookStore.Controllers.API
             }
         }
 
-        [HttpDelete("remove/{id}")]
+        [HttpGet("remove/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             if (id == null)
@@ -139,6 +139,7 @@ namespace BookStore.Controllers.API
             return Ok(true);
         }
 
+        
 
 
     }
