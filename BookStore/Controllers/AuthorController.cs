@@ -30,7 +30,7 @@ namespace BookStore.Controllers
 
             return View(listAuth);
         }
-
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             Author auth = null;
@@ -53,8 +53,19 @@ namespace BookStore.Controllers
                 //IF IS NOT VALID RENDES THE MODEL AGAIN
                 using(HttpResponseMessage http = await this._httpClientAuth.GetAsync($"get/{id}"))
                 {
+                    if (!http.IsSuccessStatusCode)
+                    {
+                        return BadRequest("Failed to fetch author from API.");
+                    }
+
                     string jsonNotValid = await http.Content.ReadAsStringAsync();
                     Author auth = JsonConvert.DeserializeObject<Author>(jsonNotValid);
+
+                    if (auth == null)
+                    {
+                        return NotFound("Author is null after deserialization.");
+                    }
+
 
                     return View(auth);
                 }

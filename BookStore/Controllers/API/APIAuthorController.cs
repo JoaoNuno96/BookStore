@@ -31,8 +31,8 @@ namespace BookStore.Controllers.API
         }
 
         //EDIT
-        [HttpPatch("edit/author")]
-        public async Task<ActionResult<bool>> UpdateAuthor(Author authParam)
+        [HttpPost("edit/author")]
+        public async Task<ActionResult<bool>> UpdateAuthor([FromBody] Author authParam)
         {
             //Verfiy If author is null
             if (authParam == null)
