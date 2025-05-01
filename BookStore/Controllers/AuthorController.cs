@@ -4,50 +4,83 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Net.Http;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
+using System.Text;
 
 namespace BookStore.Controllers
 {
     public class AuthorController : Controller
     {
-        private readonly AuthorService _authservice;
-        public AuthorController(AuthorService aus)
+        private readonly HttpClient _httpClientAuth;
+
+        public AuthorController(IHttpClientFactory httpclient)
         {
-            this._authservice = aus;
+            this._httpClientAuth = httpclient.CreateClient("AuthorApi");
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Author> listAuth = await this._authservice.GetAuthorsAsync();
+            List<Author> listAuth = null;
+            using (HttpResponseMessage httpmessage = await this._httpClientAuth.GetAsync("getAll"))
+            {
+                string json = await httpmessage.Content.ReadAsStringAsync();
+                listAuth = JsonConvert.DeserializeObject<List<Author>>(json);
+            }
 
             return View(listAuth);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            Author auth = await this._authservice.FindAuthorByIdAsync(id);
+            Author auth = null;
+
+            using (HttpResponseMessage http = await this._httpClientAuth.GetAsync($"get/{id}"))
+            {
+                string json = await http.Content.ReadAsStringAsync();
+                auth = JsonConvert.DeserializeObject<Author>(json);
+            }
 
             return View(auth);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Author auth)
+        public async Task<IActionResult> Edit(int id, Author authParam)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return View(await this._authservice.FindAuthorByIdAsync(id));
+                //IF IS NOT VALID RENDES THE MODEL AGAIN
+                using(HttpResponseMessage http = await this._httpClientAuth.GetAsync($"get/{id}"))
+                {
+                    string jsonNotValid = await http.Content.ReadAsStringAsync();
+                    Author auth = JsonConvert.DeserializeObject<Author>(jsonNotValid);
+
+                    return View(auth);
+                }
             }
 
-            await this._authservice.EditAuthorAsync(auth);
+            //SEND UPDATE TROUGH API
+            string json = JsonConvert.SerializeObject(authParam);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            await this._httpClientAuth.PostAsync("edit/author", content);
 
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            return View(await this._authservice.FindAuthorByIdAsync(id));
+            using (HttpResponseMessage http = await this._httpClientAuth.GetAsync($"get/{id}"))
+            {
+                string jsonNotValid = await http.Content.ReadAsStringAsync();
+                Author auth = JsonConvert.DeserializeObject<Author>(jsonNotValid);
+
+                return View(auth);
+            }
         }
 
-        
+
     }
 }

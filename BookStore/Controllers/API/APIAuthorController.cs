@@ -22,5 +22,28 @@ namespace BookStore.Controllers.API
         {
             return await this._authorService.GetAuthorsAsync();
         }
+
+        //GET SINGLE
+        [HttpGet("get/{id}")]
+        public async Task<ActionResult<Author>> GetSingleAuthor(int id)
+        {
+            return await this._authorService.FindAuthorByIdAsync(id);
+        }
+
+        //EDIT
+        [HttpPatch("edit/author")]
+        public async Task<ActionResult<bool>> UpdateAuthor(Author authParam)
+        {
+            //Verfiy If author is null
+            if (authParam == null)
+            {
+                return NotFound(false);
+            }
+            else
+            {
+                await this._authorService.EditAuthorAsync(authParam);
+                return Ok(true);
+            }
+        }
     }
 }
