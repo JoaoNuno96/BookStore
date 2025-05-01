@@ -106,7 +106,21 @@ namespace BookStore.Controllers.API
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpDelete("remove")]
+        [HttpPatch("update/book")]
+        public async Task<ActionResult<bool>> UpdateBook(Book book)
+        {
+            try
+            {
+                await this._bookservice.UpdateAsync(book);
+                return Ok(true);
+            }
+            catch(Exception)
+            {
+                return BadRequest(false);
+            }
+        }
+
+        [HttpDelete("remove/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             if (id == null)

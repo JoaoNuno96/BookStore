@@ -11,29 +11,29 @@ using System;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 
 namespace BookStore.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClientBook;
+        private readonly HttpClient _httpClientCat;
+        private readonly HttpClient _httpClientAuth;
+        private readonly HttpClient _httpClientPub;
 
-        private readonly BookService _bookservice;
-        private readonly AuthorService _authorservice;
-        private readonly CategoryService _categoryservice;
-        private readonly PublisherService _publisherservice;
-        public BooksController(IHttpClientFactory httpclint,BookService bookservice, AuthorService aus, CategoryService cs, PublisherService ps)
+        public BooksController(IHttpClientFactory httpclintB,IHttpClientFactory httpclintC,IHttpClientFactory httpClintA,IHttpClientFactory httpClintP)
         {
-            this._httpClient = httpclint.CreateClient("BookApi");
-            this._bookservice = bookservice;
-            this._authorservice = aus;
-            this._categoryservice = cs;
-            this._publisherservice = ps;
+            this._httpClientBook = httpclintB.CreateClient("BookApi");
+            this._httpClientCat = httpclintC.CreateClient("CategoryApi");
+            this._httpClientAuth = httpClintA.CreateClient("AuthorApi");
+            this._httpClientPub = httpClintP.CreateClient("PublisherApi");
+
         }
 
         public async Task<IActionResult> Index()
         {
-            HttpResponseMessage response = await _httpClient.GetAsync("getAll");
+            HttpResponseMessage response = await _httpClientBook.GetAsync("getAll");
 
             if(response.IsSuccessStatusCode)
             {
@@ -48,27 +48,65 @@ namespace BookStore.Controllers
 
         public async Task<IActionResult> Create()
         {
-            HttpResponseMessage response = await _httpClient.GetAsync("getViewModel");
-            if (response.IsSuccessStatusCode)
+            List<Category> categories = null;
+            List<Author> authors = null;
+            List<Publisher> pubs = null;
+
+            //CATEGORIES
+            using (HttpResponseMessage httpResponse = await _httpClientCat.GetAsync("getAll"))
             {
-                var json = await response.Content.ReadAsStringAsync();
-                BookFormViewModel bookViewModel = JsonConvert.DeserializeObject<BookFormViewModel>(json);
-                return View(bookViewModel);
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    categories = JsonConvert.DeserializeObject<List<Category>>(json);
+                }
             }
-            return View(new BookFormViewModel());
+
+            //AUTHORS
+            using (HttpResponseMessage httpResponse = await _httpClientAuth.GetAsync("getAll"))
+            {
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    authors = JsonConvert.DeserializeObject<List<Author>>(json);
+                }
+            }
+
+            //PUBLISHER
+            using (HttpResponseMessage httpResponse = await _httpClientPub.GetAsync("getAll"))
+            {
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    pubs = JsonConvert.DeserializeObject<List<Publisher>>(json);
+                }
+            }
+
+            BookFormViewModel viewModelBook = new BookFormViewModel
+            {
+                Categories = categories,
+                Publishers = pubs,
+                Authors = authors
+            };
+
+
+            return View(viewModelBook);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync($"details/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                Book book = JsonConvert.DeserializeObject<Book>(json);
-                return View(book);
-            }
+            Book book = null;
 
-            return View(new Book());
+            using (HttpResponseMessage response = await _httpClientBook.GetAsync($"details/{id}"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    book = JsonConvert.DeserializeObject<Book>(json);
+                    return View(book);
+                }
+                return View(new Book());
+            }
         }
 
         [HttpPost]
@@ -77,19 +115,18 @@ namespace BookStore.Controllers
             //Caso os dados estejam bem (validação backend)
             if(!ModelState.IsValid)
             {
-                HttpResponseMessage response = await _httpClient.GetAsync("getViewModel");
+                HttpResponseMessage response = await this._httpClientBook.GetAsync("getViewModel");
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
                     BookFormViewModel bookViewModel = JsonConvert.DeserializeObject<BookFormViewModel>(json);
-                    return View(bookViewModel);
                 }
                 return View(new BookFormViewModel());
             }
             //JSONCONVERT -> ORGANIZE CONTENT WITH JSON -> HTTPRESPONSEMESSAGE
             var jsonContent = JsonConvert.SerializeObject(book);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-            HttpResponseMessage responsePOST = await _httpClient.PostAsync("create/book", content);
+            HttpResponseMessage responsePOST = await _httpClientBook.PostAsync("create/book", content);
 
             return RedirectToAction(nameof(Index));
         }
@@ -102,69 +139,154 @@ namespace BookStore.Controllers
                 return RedirectToAction(nameof(Error), new {message = "Id not provided!"});
             }
 
-            Book book = await this._bookservice.FindBookByIdAsync(id.Value);
-
-            if(book == null)
+            using (HttpResponseMessage response = await this._httpClientBook.GetAsync($"details/{id}"))
             {
-                return RedirectToAction(nameof(Error), new { message = "Book not found!" });
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    Book book = JsonConvert.DeserializeObject<Book>(json);
+
+                    return View(book);
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Error), new { message = "Book not found!" });
+                }
             }
 
-            return View(book);
         }
 
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await this._bookservice.RemoveBookAsync(id);
-            return RedirectToAction(nameof(Index));
+
+            using (HttpResponseMessage response = await this._httpClientBook.GetAsync($"remove/{id}"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Error), new { message = "Something went wrong! " });
+                }
+            }
+
         }
 
         public async Task<IActionResult> Edit(int? id)
         {
+            Book obj = null;
+            List<Category> categories = null;
+            List<Author> authors = null;
+            List<Publisher> pubs = null;
+
             //Verificar se o id recebido é nulo
-            if(id == null)
+            if (id == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Id not provided!" });
             }
 
-            //Verificar se esse id existe na base de dados
-            Book obj = await this._bookservice.FindBookByIdAsync((int)id.Value);
+            //Verificar se esse id existe na base de dados (PELA API)
+            using (HttpResponseMessage htpmessage = await this._httpClientBook.GetAsync($"details/{id}"))
+            {
+                if (htpmessage.IsSuccessStatusCode)
+                {
+                    var json = await htpmessage.Content.ReadAsStringAsync();
+                    obj = JsonConvert.DeserializeObject<Book>(json);
+                }
+            }
 
-            if(obj == null)
+            if (obj == null)
             {
                 return RedirectToAction(nameof(Error), new { message = "Book not found!" });
             }
 
-            List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
-            List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
-            List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
-            Book book = await this._bookservice.FindBookByIdAsync(id.Value);
+            //CATEGORIES
+            using (HttpResponseMessage httpResponse = await _httpClientCat.GetAsync("getAll"))
+            {
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    categories = JsonConvert.DeserializeObject<List<Category>>(json);
+                }
+            }
+
+            //AUTHORS
+            using (HttpResponseMessage httpResponse = await _httpClientAuth.GetAsync("getAll"))
+            {
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    authors = JsonConvert.DeserializeObject<List<Author>>(json);
+                }
+            }
+
+            //PUBLISHER
+            using (HttpResponseMessage httpResponse = await _httpClientPub.GetAsync("getAll"))
+            {
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    pubs = JsonConvert.DeserializeObject<List<Publisher>>(json);
+                }
+            }
 
             BookFormViewModel model = new BookFormViewModel
             {
-                Book = book,
-                Authors = listAuthors,
-                Categories = listCategories,
-                Publishers = listPublishers
+                Book = obj,
+                Authors = authors,
+                Categories = categories,
+                Publishers = pubs
             };
 
             return View(model);
         }
-
+        [HttpPost]
         public async Task<IActionResult> Edit(int id, Book book)
         {
+            List<Category> categories = null;
+            List<Author> authors = null;
+            List<Publisher> pubs = null;
+
             if (!ModelState.IsValid)
             {
-                List<Category> listCategories = await this._categoryservice.GetCategoriesAsync();
-                List<Author> listAuthors = await this._authorservice.GetAuthorsAsync();
-                List<Publisher> listPublishers = await this._publisherservice.GetPublishersAsync();
+                //CATEGORIES
+                using (HttpResponseMessage httpResponse = await _httpClientCat.GetAsync("getAll"))
+                {
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        var json = await httpResponse.Content.ReadAsStringAsync();
+                        categories = JsonConvert.DeserializeObject<List<Category>>(json);
+                    }
+                }
+
+                //AUTHORS
+                using (HttpResponseMessage httpResponse = await _httpClientAuth.GetAsync("getAll"))
+                {
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        var json = await httpResponse.Content.ReadAsStringAsync();
+                        authors = JsonConvert.DeserializeObject<List<Author>>(json);
+                    }
+                }
+
+                //PUBLISHER
+                using (HttpResponseMessage httpResponse = await _httpClientPub.GetAsync("getAll"))
+                {
+                    if (httpResponse.IsSuccessStatusCode)
+                    {
+                        var json = await httpResponse.Content.ReadAsStringAsync();
+                        pubs = JsonConvert.DeserializeObject<List<Publisher>>(json);
+                    }
+                }
 
 
                 BookFormViewModel model = new BookFormViewModel
                 {
                     Book = book,
-                    Authors = listAuthors,
-                    Categories = listCategories,
-                    Publishers = listPublishers
+                    Authors = authors,
+                    Categories = categories,
+                    Publishers = pubs
                 };
 
                 return View(model);
@@ -175,16 +297,10 @@ namespace BookStore.Controllers
                 return RedirectToAction(nameof(Error), new { message = "Id not the same as Object passed!" });
             }
 
-            try
-            {
-                await this._bookservice.UpdateAsync(book);
-                return RedirectToAction(nameof(Index));
-            }
-            catch(ApplicationException e)
-            {
-                return RedirectToAction(nameof(Error), new { message = e.Message });
-            }
-            
+            var jsonContent = JsonConvert.SerializeObject(book);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            HttpResponseMessage responsePOST = await _httpClientBook.PostAsync("update/book", content);
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Error(string message)
