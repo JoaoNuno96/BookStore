@@ -3,23 +3,33 @@ using BookStore.Models.Services;
 using BookStore.Models.Entities;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Text;
+
 
 namespace BookStore.Controllers
 {
     public class CategoryController : Controller
     {
-        private readonly CategoryService _catservice; 
+        private readonly HttpClient _httpClient;
 
-        public CategoryController(CategoryService ct)
+        public CategoryController(IHttpClientFactory httpParam)
         {
-            this._catservice = ct;
+            this._httpClient = httpParam.CreateClient("CategoryApi");
         }
 
         public async Task<IActionResult> Index()
         {
-            List<Category> cat = await this._catservice.GetCategoriesAsync();
+            List<Category> categories = null;
 
-            return View(cat);
+            using (HttpResponseMessage httpResp = await this._httpClient.GetAsync("getAll"))
+            {
+                string json = await httpResp.Content.ReadAsStringAsync();
+                categories = JsonConvert.DeserializeObject<List<Category>>(json);
+            }
+
+            return View(categories);
         }
     }
 }
