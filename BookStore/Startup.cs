@@ -41,6 +41,7 @@ namespace BookStore
             services.AddScoped<AuthorService>();
             services.AddScoped<CategoryService>();
             services.AddScoped<PublisherService>();
+            services.AddScoped<LoginService>();
 
             //REGISTER API SERVICES
             services.AddHttpClient("BookApi", client =>

@@ -28,7 +28,6 @@ namespace BookStore.Controllers
             this._httpClientCat = httpclintC.CreateClient("CategoryApi");
             this._httpClientAuth = httpClintA.CreateClient("AuthorApi");
             this._httpClientPub = httpClintP.CreateClient("PublisherApi");
-
         }
 
         public async Task<IActionResult> Index()

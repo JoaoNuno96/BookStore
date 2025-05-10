@@ -8,6 +8,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BookStore.Controllers
 {
@@ -20,6 +21,7 @@ namespace BookStore.Controllers
             this._httpclientPub = httpclientPublisher.CreateClient("PublisherApi");
         }
 
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Index()
         {
             List<Publisher> listPub = null;

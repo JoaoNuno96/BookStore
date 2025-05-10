@@ -12,14 +12,5 @@ namespace BookStore.Models.Entities
         public string State { get; set; }
         public string PostalCode { get; set; }
 
-        public User() { }
-        //public User(string fn, string sa, string city, string st, string pc)
-        //{
-        //    this.FullName = fn;
-        //    this.StreetAddress = sa;
-        //    this.City = city;
-        //    this.State = st;
-        //    this.PostalCode = pc;
-        //}
     }
 }

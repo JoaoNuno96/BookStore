@@ -1,0 +1,16 @@
+﻿@model BookStore.Models.Entities.Auth;
+
+<div>
+    <h2>Login</h2>
+    <form asp-action="EnterAuth" method="post">
+        <label asp-for="@Model.Email" class="control-label"></label>
+        <input asp-for="@Model.Email" class="form-control" />
+
+        <label asp-for="@Model.Password" class="control-label"></label>
+        <input asp-for="@Model.Password" class="form-control" />
+
+        <br />
+        <input type="submit" value="Login" class="btn btn-info" />
+
+    </form>
+</div>
