@@ -1,0 +1,26 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: url("../img/grad.jpg");
+    background-repeat: no-repeat;
+    background-position-x:center;
+    background-position-y: center;
+    background-size:cover;
+}
+
+.login-container
+{
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+    height: 100vh;
+    color: #FFF;
+}
+
+
+#inputOfEmail input, #inputOfPassword input
+{
+    width: 400px !important;
+    margin: auto;
+}
