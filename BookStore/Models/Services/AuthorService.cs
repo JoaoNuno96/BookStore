@@ -1,6 +1,7 @@
 ﻿using BookStore.Data;
 using System.Collections.Generic;
 using BookStore.Models.Entities;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,14 @@ namespace BookStore.Models.Services
         {
             Author au = await this.FindAuthorByIdAsync(id);
             this._context.Author.Remove(au);
+            await this._context.SaveChangesAsync();
+        }
+
+        public async Task CreateNewAuthor(Author form)
+        {
+            if (form == null) throw new Exception("No object of creating has been send!");
+
+            this._context.Author.Add(form);
             await this._context.SaveChangesAsync();
         }
     }

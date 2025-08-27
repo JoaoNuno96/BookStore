@@ -91,6 +91,21 @@ namespace BookStore.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            return View();
+        }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateP(Author form)
+        {
+            string json = JsonConvert.SerializeObject(form);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            await this._httpClientAuth.PostAsync("create/author", content);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

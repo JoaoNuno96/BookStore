@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using BookStore.Models.Entities;
 using BookStore.Models.Services;
 using System.Collections.Generic;
@@ -44,6 +45,22 @@ namespace BookStore.Controllers.API
                 await this._authorService.EditAuthorAsync(authParam);
                 return Ok(true);
             }
+        }
+
+        //CREATE
+        [HttpPost("create/author")]
+        public async Task<ActionResult> CreateNewAuthor([FromBody] Author form)
+        {
+            try
+            {
+                await this._authorService.CreateNewAuthor(form);
+                return Ok(new {message = "Author created successfully!"});
+            }
+            catch(Exception error)
+            {
+                return BadRequest(error);
+            }
+            
         }
     }
 }
