@@ -2,6 +2,7 @@
 using BookStore.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,17 +24,27 @@ namespace BookStore.Models.Services
 
         public async Task CreateCategoryAsync(Category ca)
         {
+            if (ca == null) throw new Exception("Object category is null");
+
             await this._context.Category.AddAsync(ca);
             await this._context.SaveChangesAsync();
         }
         public async Task<Category> GetCategoryById(int id)
         {
-            return await this._context.Category.FirstOrDefaultAsync(x => x.Id == id);
+            Category cat = await this._context.Category
+                .FirstOrDefaultAsync(x => x.Id == id) ?? throw new Exception("Category not found!"); ;
+
+            return cat;
         }
 
-        public async Task EditCategoryAsync(Category ca)
+        public async Task EditCategoryAsync(int id, Category ca)
         {
-            this._context.Category.Update(ca);
+            if(ca == null) throw new Exception("Category is null");
+
+            Category category = await this._context.Category.FirstOrDefaultAsync(x => x.Id == id);
+
+            category.Nome = ca.Nome;
+
             await this._context.SaveChangesAsync();
         }
 

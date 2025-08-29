@@ -1,0 +1,17 @@
+﻿@model BookStore.Models.Entities.Category;
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="text-center">@ViewData["Title"]</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-6">
+        <h5 class="font-weight-bold">@Html.DisplayNameFor(x => x.Nome):</h5>
+        <p>@Html.DisplayFor(x => x.Nome)</p>
+    </div>
+
+</div>
+
