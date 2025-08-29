@@ -50,7 +50,8 @@ namespace BookStore.Models.Services
 
         public async Task RemoveCategoryAsync(int id)
         {
-            Category ca = await this.GetCategoryById(id);
+            Category ca = await this.GetCategoryById(id) ?? throw new Exception("Can't find Category with that id!");
+            
             this._context.Category.Remove(ca);
             await this._context.SaveChangesAsync();
         }

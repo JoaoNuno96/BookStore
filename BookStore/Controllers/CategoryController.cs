@@ -39,6 +39,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category newEntity)
         {
             var jsonConvert = JsonConvert.SerializeObject(newEntity);
@@ -64,6 +65,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,Category form)
         {
             var jsonContent = JsonConvert.SerializeObject(form);
@@ -85,6 +87,29 @@ namespace BookStore.Controllers
             }
 
             return View(category);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            Category cat = null;
+
+            using (HttpResponseMessage http = await this._httpClient.GetAsync($"get/{id}"))
+            {
+                string json = await http.Content.ReadAsStringAsync();
+                cat = JsonConvert.DeserializeObject<Category>(json);
+            }
+
+            return View(cat);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var response = await this._httpClient.DeleteAsync($"remove/{id}");
+
+            return RedirectToAction(nameof(Index));
         }
 
 

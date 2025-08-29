@@ -70,5 +70,21 @@ namespace BookStore.Controllers.API
             }
             
         }
+
+        //DELETE
+        [HttpDelete("remove/{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            try
+            {
+                await this._catService.RemoveCategoryAsync(id);
+                return Ok(new { message = "Category Removed with success!" });
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            
+        }
     }
 }
